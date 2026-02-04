@@ -7,19 +7,21 @@ from client.response import StreamEventType
 from agent.event import AgentEventType
 
 from context.manager import ContextManager
+from tools.registry import create_default_registry
 
 class Agent:
     def __init__(self):
         self.client = LLMClient()
         self.contextManager = ContextManager()
+        self.tool_registry = create_default_registry()
 
     async def run(self, messages : str):
         yield AgentEvent.agent_start(messages)
         self.contextManager.add_user_message(messages)
 
+        final_response : Optional[str] = None
         async for event in self._agentic_loop():
             yield event
-            final_response : Optional[str] = None
             if event.type == AgentEventType.TEXT_COMPLETE:
                 final_response = event.data.get("content")
         
@@ -27,7 +29,13 @@ class Agent:
 
     async def _agentic_loop(self) -> AsyncGenerator[AgentEvent | None]:
         response_text = ""
-        async for event in self.client.chat_completion(self.contextManager.get_messages(), True):
+        tool_schemas = self.tool_registry.get_schemas()
+
+        async for event in self.client.chat_completion(
+            self.contextManager.get_messages(), 
+            tools = tool_schemas if tool_schemas else None,
+            stream = True
+        ):
             if event.type == StreamEventType.TEXT_DELTA:
                 if event.text_delta:
                     content = event.text_delta.content

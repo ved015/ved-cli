@@ -2,6 +2,7 @@ from pydantic import BaseModel,Field
 from tools.base import Tool,ToolKind,ToolInvocation,ToolResult
 from utils.paths import resolve_path,is_binary_file
 from utils.text import count_token,truncate_text
+from typing import Optional
 
 class ReadFileParams(BaseModel):
     path : str = Field(
@@ -9,13 +10,13 @@ class ReadFileParams(BaseModel):
         description = "Path of the file to read (relative to the working directory or absolute path)"
     )
 
-    offset = int = Field(
+    offset : int = Field(
         1,
         ge = 1,
         description = "Line number to start reading from (1 based)"
     )
 
-    limit = int | None = Field(
+    limit : Optional[int] = Field(
         None,
         ge = 1,
         description = "Maximum number of lines to read. If not given read entire file"

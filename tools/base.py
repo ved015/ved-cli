@@ -26,18 +26,20 @@ class ToolResult:
     output : str
     error : Optional[str] = None
     metadata : dict[str, Any] = field(default_factory = dict)
-    truncated : bool
+    truncated : bool = False
 
     @classmethod
     def error_result(
         cls,
         error : Optional[str],
-        output : str = ""
+        output : str = "",
+        **kwargs : Any
     ):
         return cls(
             success = False,
             error = error,
             output = output,
+            **kwargs
         )
     
     @classmethod
