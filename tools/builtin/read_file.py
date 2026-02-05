@@ -28,7 +28,7 @@ class ReadFileParams(BaseModel):
     )
 
 class ReadFileTool(Tool):
-    name = "read_file_tool"
+    name = "read_file"
 
     description = (
         "Read and retrieve the contents of a text-based file from the filesystem. "
