@@ -72,16 +72,17 @@ class ToolRegistry:
         )
         
         try:
-            await tool.execute(invocation)
+            result = await tool.execute(invocation)
         except Exception as e:
             logger.exception(f"Tool {name} raised unexpected error")
-            return ToolResult.error_result(
+            result = ToolResult.error_result(
                 f"Internal error: {str(e)}",
                 metadata={
                     "tool_name",
                     name,
                 },
             )
+        return result
     
 def create_default_registry() -> ToolRegistry:
     registry = ToolRegistry()

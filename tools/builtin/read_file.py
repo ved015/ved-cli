@@ -3,6 +3,11 @@ from tools.base import Tool,ToolKind,ToolInvocation,ToolResult
 from utils.paths import resolve_path,is_binary_file
 from utils.text import count_token,truncate_text
 from typing import Optional
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+model = os.getenv('MODEL')
 
 class ReadFileParams(BaseModel):
     path : str = Field(
@@ -118,8 +123,8 @@ class ReadFileTool(Tool):
             total_lines = len(lines)
 
             if total_lines == 0:
-                return ToolResult.sucess_result(
-                    f"File is empty nothing to read.",
+                return ToolResult.success_result(
+                    "File is empty nothing to read.",
                     metadata = {
                         "lines" : 0,
                     }
@@ -140,7 +145,7 @@ class ReadFileTool(Tool):
                 formatted_lines.append(f"{i:6}|{line}")
 
             output = "\n".join(formatted_lines)
-            token_count = count_token(output)
+            token_count = count_token(output,model)
             truncated = False
 
             if token_count > self.MAX_FILE_TOKENS:
